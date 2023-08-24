@@ -35,23 +35,26 @@ class JumiaspiderSpider(scrapy.Spider):
     def parseProductData(self, response):
         base_brand_url = response.xpath(
             "//div[@class='row card _no-g -fg1 -pas']//div[@class='-phs']//a"
-        )[0].attrib[
-            "href"
-        ]  # get the base url
+        ).attrib.get("href", None)  # get the base url
         product = ProductItem()
 
         product["name"] = response.xpath(
             "//div[@class='row card _no-g -fg1 -pas']//div[@class='-df -j-bet']//h1/text()"
         ).get()
         product["url"] = response.url
+        
         product["brand"] = response.xpath(
             "//div[@class='row card _no-g -fg1 -pas']//div[@class='-phs']//a[@class='_more']/text()"
-        )[0].get()
-        product["brand_url"] = (
-            base_brand_url
-            if self.domain in base_brand_url
-            else self.domain + base_brand_url
-        )
+        ).get()
+
+
+        if base_brand_url:
+            if self.domain in base_brand_url:
+                product["brand_url"] = base_brand_url
+            else:
+                product["brand_url"] = self.domain + base_brand_url
+        
+
         product["price"] = response.xpath(
             "//div[@class='row card _no-g -fg1 -pas']//div[@class='-phs']//div[@class='df -i-ctr -fw-w']/span/text()"
         ).get()
