@@ -22,6 +22,11 @@ ROBOTSTXT_OBEY = False
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
+# ScrapeOps details
+SCRAPEOPS_API_KEY = "5649f1bf-bd1b-417e-b07e-8907ef0d9c31"
+SCRAPEOPS_HEADER_ENDPOINT = "https://headers.scrapeops.io/v1/browser-headers"
+SCRAPEOPS_NUM_HEADERS = 50
+
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
@@ -50,9 +55,9 @@ ROBOTSTXT_OBEY = False
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    "jumiascraper.middlewares.JumiascraperDownloaderMiddleware": 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+   "jumiascraper.middlewares.JumiascraperDownloaderMiddleware": 543,
+}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html

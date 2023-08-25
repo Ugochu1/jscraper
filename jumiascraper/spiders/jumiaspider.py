@@ -19,6 +19,7 @@ class JumiaspiderSpider(scrapy.Spider):
                 yield scrapy.Request(next_category_link, self.getProducts)
 
     def getProducts(self, response):
+        # get the products and the links to the product page
         products = response.xpath(
             "//div[@class='-paxs row _no-g _4cl-3cm-shs']/article"
         )
@@ -32,28 +33,40 @@ class JumiaspiderSpider(scrapy.Spider):
 
             yield scrapy.Request(next_product_link, self.parseProductData)
 
+        next_page_link = response.xpath("//a[@aria-label='Next Page']").attrib.get(
+            "href", None
+        )
+        if next_page_link is not None:
+            follow_link = (
+                next_page_link
+                if self.domain in next_page_link
+                else self.domain + next_page_link
+            )
+            # now follow the page to the next place
+            yield scrapy.Request(follow_link, self.getProducts) # call this function again
+
     def parseProductData(self, response):
         base_brand_url = response.xpath(
             "//div[@class='row card _no-g -fg1 -pas']//div[@class='-phs']//a"
-        ).attrib.get("href", None)  # get the base url
+        ).attrib.get(
+            "href", None
+        )  # get the base url
         product = ProductItem()
 
         product["name"] = response.xpath(
             "//div[@class='row card _no-g -fg1 -pas']//div[@class='-df -j-bet']//h1/text()"
         ).get()
         product["url"] = response.url
-        
+
         product["brand"] = response.xpath(
             "//div[@class='row card _no-g -fg1 -pas']//div[@class='-phs']//a[@class='_more']/text()"
         ).get()
-
 
         if base_brand_url:
             if self.domain in base_brand_url:
                 product["brand_url"] = base_brand_url
             else:
                 product["brand_url"] = self.domain + base_brand_url
-        
 
         product["price"] = response.xpath(
             "//div[@class='row card _no-g -fg1 -pas']//div[@class='-phs']//div[@class='df -i-ctr -fw-w']/span/text()"
